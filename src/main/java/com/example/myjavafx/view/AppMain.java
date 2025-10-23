@@ -1,81 +1,50 @@
 package com.example.myjavafx.view;
 
-import com.example.myjavafx.controller.MainController;
 import javafx.application.Application;
-import javafx.geometry.Insets;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Separator;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import java.io.IOException;
 
 /**
  * Vista Principal (Clase Application).
- * Construye la ventana principal (Menú y área de contenido).
- * Delega toda la lógica y navegación al MainController.
+ * Ahora solo carga el FXML principal (main-view.fxml)
+ * y adjunta la hoja de estilos CSS.
  */
 public class AppMain extends Application {
 
-    private Stage primaryStage;
-    private BorderPane mainLayout;
-    private MainController controller; // Referencia al controlador
-
     @Override
     public void start(Stage primaryStage) {
-        this.primaryStage = primaryStage;
-        this.primaryStage.setTitle("Gestión de Turnos (Capa Presentación)");
+        try {
+            // 1. Cargar el FXML de la ventana principal
+            FXMLLoader loader = new FXMLLoader();
 
-        // 1. Crear el controlador
-        this.controller = new MainController(this);
+            // Usamos una ruta absoluta desde la raíz de 'resources'
+            // Esto es más robusto.
+            loader.setLocation(AppMain.class.getResource("/com/example/myjavafx/view/main-view.fxml"));
 
-        // 2. Crear layout principal
-        mainLayout = new BorderPane();
-        mainLayout.setLeft(createMenu()); // Menú a la izquierda
+            BorderPane rootLayout = (BorderPane) loader.load();
 
-        // 3. Cargar vista inicial
-        cargarListado();
+            // 2. Crear la escena
+            Scene scene = new Scene(rootLayout);
 
-        Scene scene = new Scene(mainLayout, 800, 600);
-        primaryStage.setScene(scene);
-        primaryStage.show();
-    }
+            // 3. (IMPORTANTE) Cargar la hoja de estilos CSS
+            // También usamos una ruta absoluta
+            String css = AppMain.class.getResource("/com/example/myjavafx/view/styles.css").toExternalForm();
+            scene.getStylesheets().add(css);
 
-    private VBox createMenu() {
-        Button btnRegistro = new Button("Registro (Alta)");
-        Button btnModificar = new Button("Modificación");
-        Button btnListar = new Button("Listar / Buscar");
-        Button btnSalir = new Button("Salir");
+            // 4. Configurar el Stage
+            primaryStage.setTitle("Gestión de Turnos (FXML)");
+            primaryStage.setScene(scene);
+            primaryStage.show();
 
-        btnRegistro.setMaxWidth(Double.MAX_VALUE);
-        btnModificar.setMaxWidth(Double.MAX_VALUE);
-        btnListar.setMaxWidth(Double.MAX_VALUE);
-        btnSalir.setMaxWidth(Double.MAX_VALUE);
-
-        // --- Delegación al Controlador ---
-        btnRegistro.setOnAction(e -> cargarFormulario(null));
-        btnListar.setOnAction(e -> cargarListado());
-        btnModificar.setOnAction(e -> controller.solicitarModificacion());
-        btnSalir.setOnAction(e -> primaryStage.close());
-        // --- Fin Delegación ---
-
-        VBox menuBox = new VBox(10, btnRegistro, btnModificar, btnListar, new Separator(), btnSalir);
-        menuBox.setPadding(new Insets(15));
-        menuBox.setPrefWidth(160);
-        menuBox.setStyle("-fx-background-color: #f4f4f4;");
-        return menuBox;
-    }
-
-    // --- Métodos de Navegación (Llamados por el Controlador) ---
-
-    public void cargarListado() {
-        ListadoView listado = new ListadoView(controller);
-        mainLayout.setCenter(listado.getView());
-    }
-
-    public void cargarFormulario(Usuario usuario) {
-        FormularioView formulario = new FormularioView(controller);
-        mainLayout.setCenter(formulario.getView(usuario));
+        } catch (IOException e) {
+            // Imprimir un error detallado si el FXML o CSS no se encuentran
+            e.printStackTrace();
+            System.err.println("Error: No se pudo cargar 'main-view.fxml' o 'styles.css'.");
+            System.err.println("Asegúrese de que estén en 'src/main/resources/com/example/myjavafx/view/'");
+        }
     }
 }
 
