@@ -9,53 +9,43 @@ import javafx.scene.Node;
 import javafx.scene.layout.BorderPane;
 import java.io.IOException;
 
-/**
- * Controlador para main-view.fxml (La ventana principal).
- * Maneja la navegación principal cargando otras vistas FXML en el centro.
- */
 public class MainViewController {
 
     @FXML
-    private BorderPane contentArea; // El panel central donde se cargan las vistas
+    private BorderPane contentArea;
 
-    // El "Controlador Lógico" que maneja los datos y el estado
-    private MainController dataController;
+    private MainController dataController; // El controlador de lógica/datos
 
-    /**
-     * Llamado automáticamente después de que el FXML es cargado.
-     */
     @FXML
     private void initialize() {
-        // 1. Inicializa el controlador de lógica/datos
-        this.dataController = new MainController(this);
+        // ERROR 1 ARREGLADO: El constructor de MainController ahora está vacío.
+        this.dataController = new MainController();
 
-        // 2. Carga la vista de listado por defecto al iniciar
         handleListar();
     }
 
-    // --- Métodos de Navegación (llamados desde los botones del menú) ---
+    // --- Métodos de Navegación ---
+    // ERRORES 6 y 7 ARREGLADOS: Se cambiaron de 'private' a 'public'
 
     @FXML
-    private void handleListar() {
-        // Carga listado-view.fxml en el contentArea
+    public void handleListar() {
         loadView("listado-view.fxml", null);
     }
 
     @FXML
-    private void handleRegistro() {
-        // Carga formulario-view.fxml en modo "Alta" (Usuario es null)
+    public void handleRegistro() {
         loadView("formulario-view.fxml", null);
     }
 
     @FXML
-    private void handleModificacion() {
-        // Verifica si hay un usuario seleccionado en el controlador de datos
+    public void handleModificacion() {
+        // ERRORES 2 y 3 ARREGLADOS:
+        // Los métodos getUsuarioSeleccionado() y showAlert() ahora existen en dataController
         Usuario seleccionado = dataController.getUsuarioSeleccionado();
         if (seleccionado == null) {
             dataController.showAlert(javafx.scene.control.Alert.AlertType.WARNING, "Advertencia", "Debe seleccionar un usuario en la vista de Listado para modificar.");
             return;
         }
-        // Carga formulario-view.fxml en modo "Modificación" (pasando el usuario)
         loadView("formulario-view.fxml", seleccionado);
     }
 
@@ -64,16 +54,11 @@ public class MainViewController {
         Platform.exit();
     }
 
-
-    /**
-     * Método genérico para cargar vistas FXML en el panel central.
-     * @param fxmlFile El nombre del archivo .fxml a cargar.
-     * @param usuario El usuario (si es necesario para la vista, ej. Modificación).
-     */
     private void loadView(String fxmlFile, Usuario usuario) {
         try {
             FXMLLoader loader = new FXMLLoader();
-            loader.setLocation(AppMain.class.getResource("view/" + fxmlFile));
+            // Usamos una ruta absoluta desde la raíz de 'resources'
+            loader.setLocation(AppMain.class.getResource("/com/example/myjavafx/view/" + fxmlFile));
 
             Node view = loader.load();
 
@@ -83,7 +68,6 @@ public class MainViewController {
                 controller.init(dataController);
             } else if (fxmlFile.equals("formulario-view.fxml")) {
                 FormularioViewController controller = loader.getController();
-                // Pasamos ambos controladores: el de datos (lógica) y el de navegación (this)
                 controller.initData(dataController, this, usuario);
             }
 
@@ -91,7 +75,9 @@ public class MainViewController {
 
         } catch (IOException e) {
             e.printStackTrace();
+            // ERROR 4 ARREGLADO: showAlert() ahora existe
             dataController.showAlert(javafx.scene.control.Alert.AlertType.ERROR, "Error", "No se pudo cargar la vista: " + fxmlFile);
         }
     }
 }
+

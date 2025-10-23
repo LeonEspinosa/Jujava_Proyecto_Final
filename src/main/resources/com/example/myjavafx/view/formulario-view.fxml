@@ -19,9 +19,7 @@
 <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="15.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.myjavafx.controller.FormularioViewController">
     <children>
         <Label fx:id="lblTitulo" styleClass="view-title" text="Formulario de Alta (Registro)">
-            <font>
-                <Font name="System Bold" size="18.0" />
-            </Font>
+            <!-- BLOQUE <font> ELIMINADO DE AQUÍ -->
         </Label>
         <!-- Formulario de Campos -->
         <GridPane hgap="10.0" vgap="10.0">
@@ -67,3 +65,4 @@
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
 </VBox>
+

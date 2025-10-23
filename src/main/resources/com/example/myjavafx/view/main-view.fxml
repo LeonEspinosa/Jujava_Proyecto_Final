@@ -18,9 +18,7 @@
         <VBox fx:id="menuBox" prefWidth="180.0" spacing="10.0" styleClass="menu-bar" BorderPane.alignment="CENTER">
             <children>
                 <Label styleClass="menu-header" text="Gestión de Usuarios">
-                    <font>
-                        <Font name="System Bold" size="14.0" />
-                    </Font>
+                    <!-- BLOQUE <font> ELIMINADO DE AQUÍ -->
                 </Label>
                 <Separator prefWidth="200.0" />
                 <Button fx:id="btnListar" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#handleListar" styleClass="menu-button" text="Listar / Buscar" />
@@ -40,3 +38,4 @@
         <BorderPane fx:id="contentArea" prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER" />
     </center>
 </BorderPane>
+

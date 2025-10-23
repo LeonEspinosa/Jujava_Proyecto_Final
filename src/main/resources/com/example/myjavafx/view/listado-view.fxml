@@ -17,9 +17,7 @@
 <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="15.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.myjavafx.controller.ListadoViewController">
     <children>
         <Label styleClass="view-title" text="Listado de Usuarios">
-            <font>
-                <Font name="System Bold" size="18.0" />
-            </Font>
+            <!-- BLOQUE <font> ELIMINADO DE AQUÍ -->
         </Label>
         <!-- Área de Búsqueda -->
         <HBox alignment="CENTER_LEFT" spacing="10.0">
@@ -51,3 +49,4 @@
         <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
     </padding>
 </VBox>
+
