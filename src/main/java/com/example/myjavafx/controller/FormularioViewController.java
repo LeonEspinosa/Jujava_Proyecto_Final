@@ -136,7 +136,7 @@ public class FormularioViewController {
         boolean exito = dataController.guardarUsuario(usuarioParaGuardar, esModificacion);
 
         // Si el guardado fue exitoso, navegamos de vuelta al listado
-        //if (exito) {
+        if (exito) {
             navigationController.handleListar();
         }
     }
