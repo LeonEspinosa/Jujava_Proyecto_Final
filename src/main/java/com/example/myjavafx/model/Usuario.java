@@ -1,4 +1,4 @@
-package model;
+package com.example.myjavafx.model;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -6,7 +6,6 @@ import javafx.beans.property.StringProperty;
 /**
  * Clase Modelo (DTO) que representa al Usuario.
  * Contiene las propiedades de JavaFX para el bindeo en la TableView.
- * Esta clase será compartida entre todas las capas.
  */
 public class Usuario {
 
@@ -44,3 +43,4 @@ public class Usuario {
     public void setRol(String rol) { this.rol.set(rol); }
     public void setInfoExtra(String infoExtra) { this.infoExtra.set(infoExtra); }
 }
+

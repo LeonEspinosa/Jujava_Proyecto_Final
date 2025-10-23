@@ -1,7 +1,6 @@
-package view;
+package com.example.myjavafx.view;
 
-import controller.MainController;
-import model.Usuario;
+import com.example.myjavafx.controller.MainController;
 import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
@@ -42,10 +41,6 @@ public class AppMain extends Application {
         primaryStage.show();
     }
 
-    /**
-     * Crea el VBox del menú lateral.
-     * Todas las acciones se delegan al controlador.
-     */
     private VBox createMenu() {
         Button btnRegistro = new Button("Registro (Alta)");
         Button btnModificar = new Button("Modificación");
@@ -58,35 +53,29 @@ public class AppMain extends Application {
         btnSalir.setMaxWidth(Double.MAX_VALUE);
 
         // --- Delegación al Controlador ---
-        btnRegistro.setOnAction(e -> cargarFormulario(null)); // Cargar formulario vacío
+        btnRegistro.setOnAction(e -> cargarFormulario(null));
         btnListar.setOnAction(e -> cargarListado());
-        btnModificar.setOnAction(e -> controller.solicitarModificacion()); // El controlador verifica la selección
+        btnModificar.setOnAction(e -> controller.solicitarModificacion());
         btnSalir.setOnAction(e -> primaryStage.close());
         // --- Fin Delegación ---
 
         VBox menuBox = new VBox(10, btnRegistro, btnModificar, btnListar, new Separator(), btnSalir);
         menuBox.setPadding(new Insets(15));
-        menuBox.setPrefWidth(160); // Ancho fijo para el menú
+        menuBox.setPrefWidth(160);
         menuBox.setStyle("-fx-background-color: #f4f4f4;");
         return menuBox;
     }
 
     // --- Métodos de Navegación (Llamados por el Controlador) ---
 
-    /**
-     * Carga la vista de Listado en el centro del BorderPane.
-     */
     public void cargarListado() {
         ListadoView listado = new ListadoView(controller);
         mainLayout.setCenter(listado.getView());
     }
 
-    /**
-     * Carga la vista de Formulario en el centro del BorderPane.
-     * @param usuario El usuario a modificar, o null para un alta.
-     */
     public void cargarFormulario(Usuario usuario) {
         FormularioView formulario = new FormularioView(controller);
         mainLayout.setCenter(formulario.getView(usuario));
     }
 }
+

@@ -1,7 +1,6 @@
-package view;
+package com.example.myjavafx.view;
 
-import controller.MainController;
-import model.Usuario;
+import com.example.myjavafx.controller.MainController;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
@@ -11,15 +10,13 @@ import java.util.Arrays;
 
 /**
  * Vista del Formulario (Alta y Modificación).
- * Es "tonta": solo dibuja la UI, recolecta datos y delega
- * la acción de "Guardar" al MainController.
+ * Delega la acción de "Guardar" al MainController.
  */
 public class FormularioView {
 
     private final MainController controller;
-    private Usuario usuarioActual; // El usuario que se está modificando (o null si es Alta)
+    private Usuario usuarioActual;
 
-    // Componentes del Formulario
     private ComboBox<String> cmbRol;
     private TextField txtDNI;
     private TextField txtNombre;
@@ -33,9 +30,6 @@ public class FormularioView {
         this.controller = controller;
     }
 
-    /**
-     * Construye y devuelve el VBox principal de esta vista.
-     */
     public VBox getView(Usuario usuario) {
         this.usuarioActual = usuario;
         boolean esModificacion = (usuario != null);
@@ -53,41 +47,33 @@ public class FormularioView {
         return view;
     }
 
-    // --- Componentes y Diseño ---
-
     private GridPane createFormFields(boolean esModificacion) {
         GridPane grid = new GridPane();
         grid.setVgap(10);
         grid.setHgap(10);
         grid.setPadding(new Insets(10));
 
-        // 1. ROL
         cmbRol = new ComboBox<>();
         cmbRol.getItems().addAll(Arrays.asList("Paciente", "Médico", "Administrativo"));
         cmbRol.setPromptText("Seleccione Rol");
 
-        // 2. Campos Fijos
         txtDNI = new TextField(); txtDNI.setPromptText("DNI");
         txtNombre = new TextField(); txtNombre.setPromptText("Nombre");
         txtApellido = new TextField(); txtApellido.setPromptText("Apellido");
 
-        // 3. Campos Dinámicos
         lblInfoExtra = new Label("Información Específica:");
         txtInfoExtra = new TextField();
         vbDatosEspecificos = new VBox(5, lblInfoExtra, txtInfoExtra);
-        vbDatosEspecificos.setVisible(false); // Oculto por defecto
+        vbDatosEspecificos.setVisible(false);
 
-        // Listener para la lógica de campos dinámicos (esto es lógica de vista)
         cmbRol.valueProperty().addListener((obs, oldVal, newVal) -> actualizarCamposDinamicos(newVal));
 
-        // Añadir al Grid
         grid.addRow(0, new Label("Rol:"), cmbRol);
         grid.addRow(1, new Label("DNI:"), txtDNI);
         grid.addRow(2, new Label("Nombre:"), txtNombre);
         grid.addRow(3, new Label("Apellido:"), txtApellido);
-        grid.add(vbDatosEspecificos, 0, 4, 2, 1); // Ocupa dos columnas
+        grid.add(vbDatosEspecificos, 0, 4, 2, 1);
 
-        // Cargar datos si es modificación
         if (esModificacion) {
             cargarDatosParaModificacion();
         }
@@ -99,19 +85,13 @@ public class FormularioView {
         btnGuardar = new Button(esModificacion ? "Guardar Modificación" : "Registrar");
         Button btnCancelar = new Button("Cancelar");
 
-        // Delegación de eventos al controlador
         btnGuardar.setOnAction(e -> handleGuardar());
-        btnCancelar.setOnAction(e -> controller.mainView.cargarListado()); // Navega al listado
+        btnCancelar.setOnAction(e -> controller.getMainView().cargarListado()); // Navega al listado
 
         HBox buttonBox = new HBox(10, btnGuardar, btnCancelar);
         return buttonBox;
     }
 
-    // --- Lógica de Estado de la Vista ---
-
-    /**
-     * Muestra u oculta campos según el Rol. Esto es lógica de presentación.
-     */
     private void actualizarCamposDinamicos(String rol) {
         if (rol == null) {
             vbDatosEspecificos.setVisible(false);
@@ -128,33 +108,24 @@ public class FormularioView {
             lblInfoExtra.setText("Sector del Administrativo:");
             txtInfoExtra.setPromptText("Ej. Turnos");
         } else {
-            // Paciente
             vbDatosEspecificos.setVisible(false);
         }
     }
 
-    /**
-     * Rellena el formulario si estamos en modo Modificación.
-     */
     private void cargarDatosParaModificacion() {
         if (usuarioActual == null) return;
 
         txtDNI.setText(usuarioActual.getDni());
-        txtDNI.setEditable(false); // El DNI (PK) no se debe modificar
-        txtDNI.setStyle("-fx-background-color: #eeeeee;"); // Feedback visual
+        txtDNI.setEditable(false);
+        txtDNI.setStyle("-fx-background-color: #eeeeee;");
 
         txtNombre.setText(usuarioActual.getNombre());
         txtApellido.setText(usuarioActual.getApellido());
 
-        // Esto dispara el listener y llama a actualizarCamposDinamicos()
         cmbRol.setValue(usuarioActual.getRol());
         txtInfoExtra.setText(usuarioActual.getInfoExtra());
     }
 
-    /**
-     * Recolecta los datos y los envía al controlador para guardar.
-     * La vista NO valida ni crea objetos de negocio.
-     */
     private void handleGuardar() {
         String dni = txtDNI.getText();
         String nombre = txtNombre.getText();
@@ -163,17 +134,17 @@ public class FormularioView {
         String infoExtra = vbDatosEspecificos.isVisible() ? txtInfoExtra.getText() : "";
 
         if (usuarioActual != null) {
-            // Modificación: Actualizamos el objeto existente
-            // (En una app pura, pasaríamos los datos crudos al controlador)
+            // Modificación
             usuarioActual.setNombre(nombre);
             usuarioActual.setApellido(apellido);
             usuarioActual.setRol(rol);
             usuarioActual.setInfoExtra(infoExtra);
             controller.guardarUsuario(usuarioActual, true);
         } else {
-            // Registro: Creamos un DTO y lo pasamos al controlador
+            // Registro
             Usuario nuevoUsuario = new Usuario(dni, nombre, apellido, rol, infoExtra);
             controller.guardarUsuario(nuevoUsuario, false);
         }
     }
 }
+

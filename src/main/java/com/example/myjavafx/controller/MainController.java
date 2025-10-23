@@ -1,7 +1,7 @@
-package controller;
+package com.example.myjavafx.controller;
 
-import model.Usuario;
-import view.AppMain;
+import com.example.myjavafx.model.Usuario;
+import com.example.myjavafx.view.AppMain;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -13,11 +13,10 @@ import java.util.Optional;
 /**
  * Controlador de la Capa de Presentación.
  * Maneja el estado de la UI y la lógica de presentación.
- * Es el único que se comunica con las Vistas y (en el futuro) con la Capa de Negocio.
  */
 public class MainController {
 
-    private final AppMain mainView; // Referencia a la vista principal (AppMain) para navegación
+    private AppMain mainView; // Referencia a la vista principal (AppMain) para navegación
     private final ObservableList<Usuario> masterData; // Lista maestra de datos
     private final FilteredList<Usuario> filteredData; // Lista filtrada para la tabla
     private Usuario usuarioSeleccionado; // Estado: Usuario seleccionado en la tabla
@@ -27,7 +26,6 @@ public class MainController {
 
         // --- SIMULACIÓN DE CAPA DE DATOS ---
         // En una app real, esta lista vendría de la Capa de Negocio (Servicio).
-        // Por ahora, la hardcodeamos aquí (fuera de la vista).
         this.masterData = FXCollections.observableArrayList(
                 new Usuario("11111111", "Juan", "Pérez", "Paciente", ""),
                 new Usuario("22222222", "María", "Gómez", "Médico", "Matr. 1234"),
@@ -40,23 +38,14 @@ public class MainController {
 
     // --- Métodos llamados por las Vistas ---
 
-    /**
-     * Solicitado por ListadoView para poblar la tabla.
-     */
     public FilteredList<Usuario> getFilteredData() {
         return filteredData;
     }
 
-    /**
-     * Solicitado por ListadoView cuando se selecciona una fila.
-     */
     public void setUsuarioSeleccionado(Usuario usuario) {
         this.usuarioSeleccionado = usuario;
     }
 
-    /**
-     * Solicitado por el menú de AppMain (Modificar).
-     */
     public void solicitarModificacion() {
         if (usuarioSeleccionado == null) {
             showAlert(Alert.AlertType.WARNING, "Advertencia", "Debe seleccionar un usuario en la vista de Listado para modificar.");
@@ -65,9 +54,6 @@ public class MainController {
         mainView.cargarFormulario(usuarioSeleccionado);
     }
 
-    /**
-     * Solicitado por ListadoView (Botón Buscar).
-     */
     public void buscarUsuarioPorDNI(String dni) {
         String dniTrimmed = dni.trim();
         filteredData.setPredicate(usuario -> {
@@ -82,25 +68,13 @@ public class MainController {
         }
     }
 
-    /**
-     * Solicitado por FormularioView (Botón Guardar).
-     */
     public void guardarUsuario(Usuario usuario, boolean esModificacion) {
         // --- LÓGICA DE NEGOCIO (SIMULADA) ---
-        // Aquí iría la validación (ej. DNI duplicado, campos obligatorios).
-        // En una app real:
-        // 1. Validar campos
-        // 2. if (esModificacion) { usuarioService.actualizar(usuario); }
-        // 3. else { usuarioService.registrar(usuario); }
-
         if (!validarUsuario(usuario, esModificacion)) {
-            return; // La validación falló, la alerta ya se mostró.
+            return; // La validación falló
         }
 
         if (esModificacion) {
-            // El objeto 'usuario' es una referencia al de masterData,
-            // pero si viniera de la capa de negocio, haríamos:
-            // masterData.set(masterData.indexOf(usuario), usuario);
             showAlert(Alert.AlertType.INFORMATION, "Éxito", "Usuario modificado correctamente.");
         } else {
             masterData.add(usuario);
@@ -108,36 +82,25 @@ public class MainController {
         }
         // --- FIN LÓGICA DE NEGOCIO (SIMULADA) ---
 
-        // Navegamos de vuelta al listado
         this.usuarioSeleccionado = null;
         mainView.cargarListado();
     }
 
-    /**
-     * Solicitado por ListadoView (Botón Eliminar).
-     */
     public void eliminarUsuarioSeleccionado() {
         if (usuarioSeleccionado == null) {
             showAlert(Alert.AlertType.WARNING, "Advertencia", "Debe seleccionar una fila para eliminar.");
             return;
         }
 
-        // Pedimos confirmación (Lógica de Presentación)
         Optional<ButtonType> result = showConfirmation("¿Seguro que desea eliminar al usuario con DNI " + usuarioSeleccionado.getDni() + "?");
 
         if (result.isPresent() && result.get() == ButtonType.YES) {
-            // --- LÓGICA DE NEGOCIO (SIMULADA) ---
-            // En una app real: usuarioService.eliminar(usuarioSeleccionado.getDni());
             masterData.remove(usuarioSeleccionado);
-            // --- FIN LÓGICA ---
             showAlert(Alert.AlertType.INFORMATION, "Eliminación", "Usuario eliminado correctamente.");
             usuarioSeleccionado = null;
         }
     }
 
-    /**
-     * Lógica de validación (Simulada - Debería estar en Capa de Negocio).
-     */
     private boolean validarUsuario(Usuario u, boolean esModificacion) {
         if (u.getDni().trim().isEmpty() || u.getNombre().trim().isEmpty() || u.getRol() == null) {
             showAlert(Alert.AlertType.ERROR, "Error", "DNI, Nombre, y Rol son obligatorios.");
@@ -148,7 +111,6 @@ public class MainController {
             return false;
         }
 
-        // Validación de DNI duplicado (Solo en Alta)
         if (!esModificacion) {
             boolean duplicado = masterData.stream().anyMatch(existente -> existente.getDni().equals(u.getDni()));
             if (duplicado) {
@@ -159,7 +121,6 @@ public class MainController {
 
         return true;
     }
-
 
     // --- Métodos de UI (Helpers) ---
 
@@ -177,4 +138,10 @@ public class MainController {
         alert.setHeaderText(null);
         return alert.showAndWait();
     }
+
+    // Getter para que FormularioView pueda navegar de vuelta
+    public AppMain getMainView() {
+        return mainView;
+    }
 }
+

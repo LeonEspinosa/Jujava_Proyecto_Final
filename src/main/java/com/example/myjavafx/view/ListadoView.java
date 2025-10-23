@@ -1,7 +1,6 @@
-package view;
+package com.example.myjavafx.view;
 
-import controller.MainController;
-import model.Usuario;
+import com.example.myjavafx.controller.MainController;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
@@ -9,7 +8,7 @@ import javafx.scene.layout.VBox;
 
 /**
  * Vista del Listado (Tabla y Búsqueda).
- * Es "tonta": solo dibuja la UI y delega eventos al MainController.
+ * Delega eventos al MainController.
  */
 public class ListadoView {
 
@@ -18,13 +17,9 @@ public class ListadoView {
 
     public ListadoView(MainController controller) {
         this.controller = controller;
-        // Limpiamos la selección anterior al cargar la vista
         this.controller.setUsuarioSeleccionado(null);
     }
 
-    /**
-     * Construye y devuelve el VBox principal de esta vista.
-     */
     public VBox getView() {
         HBox buscadorBox = createBuscador();
         tblUsuarios = createTable();
@@ -35,14 +30,10 @@ public class ListadoView {
         return view;
     }
 
-    // --- Componentes ---
-
     private TableView<Usuario> createTable() {
         TableView<Usuario> table = new TableView<>();
-        // Pide los datos al controlador
         table.setItems(controller.getFilteredData());
 
-        // Mapeo de Columnas
         TableColumn<Usuario, String> colDni = new TableColumn<>("DNI");
         colDni.setCellValueFactory(cellData -> cellData.getValue().dniProperty());
         colDni.setPrefWidth(100);
@@ -62,7 +53,6 @@ public class ListadoView {
         table.getColumns().addAll(colDni, colNombre, colApellido, colRol);
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        // Listener de Selección: Informa al controlador del estado
         table.getSelectionModel().selectedItemProperty().addListener(
                 (obs, oldSelection, newSelection) -> {
                     controller.setUsuarioSeleccionado(newSelection);
@@ -78,9 +68,8 @@ public class ListadoView {
 
         Button btnBuscar = new Button("Buscar");
 
-        // Delegación de eventos al controlador
         btnBuscar.setOnAction(e -> controller.buscarUsuarioPorDNI(txtDni.getText()));
-        txtDni.setOnAction(e -> controller.buscarUsuarioPorDNI(txtDni.getText())); // Buscar al presionar ENTER
+        txtDni.setOnAction(e -> controller.buscarUsuarioPorDNI(txtDni.getText()));
 
         HBox buscadorBox = new HBox(5, txtDni, btnBuscar);
         buscadorBox.setPadding(new Insets(0, 0, 10, 0));
@@ -95,3 +84,4 @@ public class ListadoView {
         return controlBox;
     }
 }
+
